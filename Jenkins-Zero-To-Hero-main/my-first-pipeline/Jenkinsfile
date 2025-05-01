@@ -1,28 +1,25 @@
-// Jenkinsfile
 node {
-  
-  // 1) Checkout source code from SCM (Git, etc.)
   stage('Checkout') {
     checkout scm
   }
 
-  // 2) Run your steps inside a Docker container
   stage('Test in Docker') {
     script {
-      // Pull the Node.js Docker image (lightweight version)
+      // Define the Docker image
       def img = docker.image('node:16-alpine')
 
-      img.pull()  // Make sure it's up to date
+      // Pull the image if not already available
+      img.pull()
 
-      // Run the following inside the container
+      // Run commands inside the Docker container
       img.inside(
-        // Mount only your Jenkins workspace into /workspace
-        "-v ${env.WORKSPACE}:/workspace -w /workspace"
+        // Mount the Windows workspace into /workspace in the container
+        '-v C:\\ProgramData\\Jenkins\\.jenkins\\workspace\\Zero-to-hero:/workspace ' +
+        // Set the working directory inside the container
+        '-w /workspace'
       ) {
-        // Now you're inside the Docker container at /workspace
-        sh 'node --version'  // Check node version
-        sh 'npm install'     // Example: install dependencies
-        sh 'npm test'        // Example: run tests
+        // Execute the desired command
+        bat 'node --version'
       }
     }
   }
