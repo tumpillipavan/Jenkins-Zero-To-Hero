@@ -6,11 +6,11 @@ pipeline {
       steps {
         bat """
           docker pull maven:3.8.1-adoptopenjdk-11
-          docker run --rm ^
+          docker run -d --name backend-container ^
             -v C:\\ProgramData\\Jenkins\\.jenkins\\workspace\\my-first-pipleline:/workspace ^
             -w /workspace ^
             maven:3.8.1-adoptopenjdk-11 ^
-            mvn --version
+            tail -f /dev/null
         """
       }
     }
@@ -19,11 +19,36 @@ pipeline {
       steps {
         bat """
           docker pull node:16-alpine
-          docker run --rm ^
+          docker run -d --name frontend-container ^
             -v C:\\ProgramData\\Jenkins\\.jenkins\\workspace\\my-first-pipleline:/workspace ^
             -w /workspace ^
             node:16-alpine ^
-            node --version
+            tail -f /dev/null
+        """
+      }
+    }
+
+    stage('Execute Back-end Command') {
+      steps {
+        bat """
+          docker exec backend-container mvn --version
+        """
+      }
+    }
+
+    stage('Execute Front-end Command') {
+      steps {
+        bat """
+          docker exec frontend-container node --version
+        """
+      }
+    }
+
+    stage('Cleanup') {
+      steps {
+        bat """
+          docker stop backend-container frontend-container
+          docker rm backend-container frontend-container
         """
       }
     }
