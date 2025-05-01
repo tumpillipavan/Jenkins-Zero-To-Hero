@@ -2,15 +2,16 @@ pipeline {
   agent {
     docker {
       image 'node:16-alpine'
-      args '-v /c/ProgramData/Jenkins/.jenkins/workspace/Zero-to-hero:/workspace'  // mapping Windows path to Unix style
+      args  '-v /c/ProgramData/Jenkins/.jenkins/workspace/Zero-to-hero:/workspace ' +
+            '-w /workspace'
     }
   }
   stages {
     stage('Test') {
       steps {
+        // inside the container, /workspace is your Jenkins workspace
         sh 'node --version'
       }
     }
   }
 }
-
