@@ -1,26 +1,30 @@
 pipeline {
-  agent none
+  agent any
+
   stages {
     stage('Back-end') {
-      agent {
-        docker {
-          image 'maven:3.8.1-adoptopenjdk-11'
-          args '-v /c/ProgramData/Jenkins/.jenkins/workspace/my-first-pipleline:/workspace -w /workspace'
-        }
-      }
       steps {
-        bat 'mvn --version'
+        bat """
+          docker pull maven:3.8.1-adoptopenjdk-11
+          docker run --rm ^
+            -v C:\\ProgramData\\Jenkins\\.jenkins\\workspace\\my-first-pipleline:/workspace ^
+            -w /workspace ^
+            maven:3.8.1-adoptopenjdk-11 ^
+            mvn --version
+        """
       }
     }
+
     stage('Front-end') {
-      agent {
-        docker {
-          image 'node:16-alpine'
-          args '-v /c/ProgramData/Jenkins/.jenkins/workspace/my-first-pipleline:/workspace -w /workspace'
-        }
-      }
       steps {
-        bat 'node --version'
+        bat """
+          docker pull node:16-alpine
+          docker run --rm ^
+            -v C:\\ProgramData\\Jenkins\\.jenkins\\workspace\\my-first-pipleline:/workspace ^
+            -w /workspace ^
+            node:16-alpine ^
+            node --version
+        """
       }
     }
   }
