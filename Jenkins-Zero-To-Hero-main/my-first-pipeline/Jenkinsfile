@@ -1,15 +1,18 @@
 pipeline {
-  agent {
-    docker {
-      image 'node:16-alpine'
-      args '-v C:/ProgramData/Jenkins/.jenkins/workspace:/workspace' // Absolute path here
-    }
-  }
+  agent any
   stages {
-    stage('Test') {
+    stage('Test in Docker') {
       steps {
-        bat 'node --version'
+        // Run node:16-alpine with an explicit Windows-style mount
+        bat """
+          docker run --rm ^
+            -v C:\\ProgramData\\Jenkins\\.jenkins\\workspace\\my-first-pipleline:/workspace ^
+            -w /workspace ^
+            node:16-alpine ^
+            node --version
+        """
       }
     }
   }
 }
+
