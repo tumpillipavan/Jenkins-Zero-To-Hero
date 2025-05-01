@@ -1,29 +1,28 @@
-// my-first-pipeline/Jenkinsfile
+// Jenkinsfile
 node {
-
-  // 1) Checkout your code
+  
+  // 1) Checkout source code from SCM (Git, etc.)
   stage('Checkout') {
     checkout scm
   }
 
-  // 2) Run inside Docker, with only your mounts
+  // 2) Run your steps inside a Docker container
   stage('Test in Docker') {
     script {
-      // define the image
+      // Pull the Node.js Docker image (lightweight version)
       def img = docker.image('node:16-alpine')
 
-      // pull it if needed
-      img.pull()
+      img.pull()  // Make sure it's up to date
 
-      // run commands inside, mounting only the Unix-style path you control
+      // Run the following inside the container
       img.inside(
-        // mount the Windows workspace into /workspace in the container
-        "-v /c/ProgramData/Jenkins/.jenkins/workspace/Zero-to-hero:/workspace " +
-        // set that as the working dir
-        "-w /workspace"
+        // Mount only your Jenkins workspace into /workspace
+        "-v ${env.WORKSPACE}:/workspace -w /workspace"
       ) {
-        // now this runs in /workspace, with no conflicting Windows paths
-        sh 'node --version'
+        // Now you're inside the Docker container at /workspace
+        sh 'node --version'  // Check node version
+        sh 'npm install'     // Example: install dependencies
+        sh 'npm test'        // Example: run tests
       }
     }
   }
