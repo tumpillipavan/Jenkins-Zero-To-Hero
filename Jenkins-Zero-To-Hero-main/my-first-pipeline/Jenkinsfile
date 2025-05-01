@@ -1,25 +1,11 @@
-node {
-  stage('Checkout') {
-    checkout scm
+pipeline {
+  agent {
+    docker { image 'node:16-alpine' }
   }
-
-  stage('Test in Docker') {
-    script {
-      // Define the Docker image
-      def img = docker.image('node:16-alpine')
-
-      // Pull the image if not already available
-      img.pull()
-
-      // Run commands inside the Docker container
-      img.inside(
-        // Mount the Windows workspace into /workspace in the container
-        '-v C:\\ProgramData\\Jenkins\\.jenkins\\workspace\\Zero-to-hero:/workspace ' +
-        // Set the working directory inside the container
-        '-w /workspace'
-      ) {
-        // Execute the desired command
-        bat 'node --version'
+  stages {
+    stage('Test') {
+      steps {
+        sh 'node --version'
       }
     }
   }
